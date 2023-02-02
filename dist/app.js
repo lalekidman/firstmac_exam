@@ -18,30 +18,30 @@ catch (error) {
 }
 console.log('data :>>  ', userData);
 console.log('input :>> ', input);
-const closestLink = (steps, from, to) => {
+const closestLink = (link, from, to) => {
     if (from <= userData.length) {
-        const follows = userData[from].follows.sort().filter((userId) => !(steps.includes(userId)));
-        if (!steps.includes(from)) {
-            steps.push(from);
+        // remove all of the user who already in the link
+        const follows = userData[from].follows.sort().filter((userId) => !(link.includes(userId)));
+        if (!link.includes(from)) {
+            link.push(from);
             if (follows.includes(to)) {
-                steps.push(to);
+                link.push(to);
             }
             else {
                 for (const follow of follows) {
-                    steps = closestLink(steps, follow, to);
-                    if (steps.includes(to)) {
+                    link = closestLink(link, follow, to);
+                    if (link.includes(to)) {
                         break;
                     }
                 }
             }
         }
     }
-    return steps;
+    return link;
 };
 console.log("Scenario               Shortest Link");
 for (const { from, to } of userSearchInput) {
     let shortest = [];
-    let allSteps = [];
     if (from <= userData.length) {
         const follows = userData[from].follows.sort();
         if (follows.includes(to)) {
@@ -50,25 +50,17 @@ for (const { from, to } of userSearchInput) {
         else {
             let first = true;
             for (const follow of follows) {
-                if (!allSteps.includes(follow)) {
-                    const finalSteps = closestLink([from], follow, to);
-                    allSteps = [
-                        // use `Set` to avoid duplicate step.
-                        ...new Set([
-                            ...finalSteps,
-                            ...allSteps
-                        ])
-                    ];
-                    if (!first) {
-                        if (finalSteps.length < shortest.length) {
-                            // overwrite the value with the shortest steps.
-                            shortest = finalSteps;
-                        }
-                    }
-                    else {
-                        first = false;
+                const finalSteps = closestLink([from], follow, to);
+                // console.log('finalSteps :>> ', finalSteps);
+                if (!first) {
+                    if (finalSteps.length < shortest.length) {
+                        // overwrite the value with the shortest steps.
                         shortest = finalSteps;
                     }
+                }
+                else {
+                    first = false;
+                    shortest = finalSteps;
                 }
             }
         }

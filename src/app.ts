@@ -32,16 +32,23 @@ interface IOption {
 const closestLink = (link: number[], from: number, to: number):number[] => {
   if (from <= userData.length) {
     // remove all of the user who already in the link
-    const follows = userData[from].follows.sort().filter((userId) => !(link.includes(userId)))
-    if (!link.includes(from)) {
-      link.push(from)
-      if (follows.includes(to)) {
-        link.push(to)
-      } else {
-        for (const follow of follows) {
-          link = closestLink(link, follow, to)
-          if (link.includes(to)) {
-            break;
+    // const follows = userData[from].follows.sort()
+    if (!link.includes(to)) {
+      if (!link.includes(from)) {
+        link.push(from)
+        const follows = userData[from].follows.sort().filter((userId) => !(link.includes(userId)))
+        if (follows.includes(to)) {
+          link.push(to)
+          // here, it should be done right?
+        } else {
+          for (const follow of follows) {
+            console.log('link beforex :>> ', link);
+            const nestedLink = closestLink(link, follow, to)
+            console.log('link afterx :>> ', link);
+            // if (link.length >= nestedLink.length) {
+            //   // overwrite the value with the shortest steps.
+            //   link = nestedLink
+            // }
           }
         }
       }
@@ -52,28 +59,7 @@ const closestLink = (link: number[], from: number, to: number):number[] => {
 
 console.log("Scenario               Shortest Link")
 for (const {from, to} of userSearchInput) {
-  let shortest:number[] = []
-  if (from <= userData.length) {
-    const follows = userData[from].follows.sort()
-    if (follows.includes(to)) {
-      shortest = [from, to]
-    } else {
-      let first = true
-      for (const follow of follows) {
-        const finalSteps = closestLink([from], follow, to)
-        // console.log('finalSteps :>> ', finalSteps);
-        if (!first) {
-          if (finalSteps.length < shortest.length) {
-            // overwrite the value with the shortest steps.
-            shortest = finalSteps
-          }
-        } else {
-          first = false
-          shortest = finalSteps
-        }
-      }
-    }
-  }
+  let shortest:number[] = closestLink([], from, to)
   if (shortest.includes(to)) {
     console.log(`Case ${from} to ${to}:           ${shortest.join("->")}`)
   } else {

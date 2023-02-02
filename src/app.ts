@@ -1,6 +1,4 @@
 import fs from 'fs'
-
-
 const data = fs.readFileSync("./data/data.json", {encoding: "utf-8"})
 const input = fs.readFileSync("./data/input.json", {encoding: "utf-8"})
 

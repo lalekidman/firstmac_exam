@@ -22,34 +22,29 @@ try {
   // ignore or skip
 }
 
-console.log('data :>>  ', userData);
-console.log('input :>> ', input);
+// console.log('data :>>  ', userData);
+// console.log('input :>> ', input);
 
-interface IOption {
-  from: number,
-  to: number
-}
 const closestLink = (link: number[], from: number, to: number):number[] => {
   if (from <= userData.length) {
     // remove all of the user who already in the link
-    // const follows = userData[from].follows.sort()
     if (!link.includes(to)) {
       if (!link.includes(from)) {
         link.push(from)
         const follows = userData[from].follows.sort().filter((userId) => !(link.includes(userId)))
         if (follows.includes(to)) {
           link.push(to)
-          // here, it should be done right?
         } else {
+          let shortes:number[] = []
           for (const follow of follows) {
-            console.log('link beforex :>> ', link);
-            const nestedLink = closestLink(link, follow, to)
-            console.log('link afterx :>> ', link);
-            // if (link.length >= nestedLink.length) {
-            //   // overwrite the value with the shortest steps.
-            //   link = nestedLink
-            // }
+            const nestedLink = closestLink([...link], follow, to)
+            if (nestedLink.includes(to)) {
+              if (shortes.length === 0 || nestedLink.length < shortes.length) {
+                shortes = nestedLink
+              }
+            }
           }
+          link = shortes
         }
       }
     }
